@@ -62,6 +62,7 @@ function Form() {
         Nome do serviço
         <input
           required
+          type="text"
           name="serviceName"
           value={ formInfo.serviceName }
           onChange={ handleChange }
@@ -71,6 +72,7 @@ function Form() {
         Login
         <input
           required
+          type="text"
           name="login"
           value={ formInfo.login }
           onChange={ handleChange }
@@ -101,6 +103,7 @@ function Form() {
         URL
         <input
           required
+          type="text"
           name="url"
           value={ formInfo.url }
           onChange={ handleChange }

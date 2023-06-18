@@ -5,3 +5,8 @@
 .invalid-password-check {
   color: #f58989;
 }
+
+body {
+  background-color: #1c1b1b;
+  color: #e3e3e3;
+}

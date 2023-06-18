@@ -1,14 +1,34 @@
 import { useState } from 'react';
+import RegisteredCard from './Register';
+
+interface Info {
+  url: string;
+  login: string;
+  serviceName: string;
+  password: string;
+}
 
 function Form() {
   const [naoPreenchido, setNaoPreenchido] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [registeredPasswords, setRegisteredPasswords] = useState<Info[]>([]);
   const [formInfo, setFormInfo] = useState({
     serviceName: '',
     login: '',
     password: '',
     url: '',
   });
+  const valid = 'valid-password-check';
+  const invalid = 'invalid-password-check';
+
+  function clearForm() {
+    setFormInfo({
+      serviceName: '',
+      login: '',
+      password: '',
+      url: '',
+    });
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -26,12 +46,7 @@ function Form() {
   function handleCancel(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     setShowForm(!showForm);
     e.preventDefault();
-    setFormInfo({
-      serviceName: '',
-      login: '',
-      password: '',
-      url: '',
-    });
+    clearForm();
   }
 
   function validatePassword() {
@@ -42,9 +57,13 @@ function Form() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (validatePassword()) {
-      console.log('🍌');
-    } else {
-      console.log('not 🍌');
+      registeredPasswords.push(formInfo);
+      setRegisteredPasswords(
+        [...registeredPasswords],
+      );
+      clearForm();
+      setShowForm(false);
+      return registeredPasswords;
     }
   }
 
@@ -87,18 +106,37 @@ function Form() {
           onChange={ handleChange }
         />
       </label>
-      {formInfo.password.trim().length > 8
-        ? <p className="valid-password-check">Possuir 8 ou mais caracteres</p>
-        : <p className="invalid-password-check">Possuir 8 ou mais caracteres</p>}
-      {formInfo.password.trim().length < 16
-        ? <p className="valid-password-check">Possuir até 16 caracteres</p>
-        : <p className="invalid-password-check">Possuir até 16 caracteres</p>}
-      {/[a-zA-Z]/.test(formInfo.password) && /\d/.test(formInfo.password)
-        ? <p className="valid-password-check">Possuir letras e números</p>
-        : <p className="invalid-password-check">Possuir letras e números</p>}
-      {/\W/.test(formInfo.password)
-        ? <p className="valid-password-check">Possuir algum caractere especial</p>
-        : <p className="invalid-password-check">Possuir algum caractere especial</p>}
+
+      <div>
+        <p
+          className={ formInfo.password.trim().length > 8
+            ? valid
+            : invalid }
+        >
+          Possuir 8 ou mais caracteres
+        </p>
+        <p
+          className={ formInfo.password.trim().length < 16
+            ? valid
+            : invalid }
+        >
+          Possuir até 16 caracteres
+        </p>
+        <p
+          className={ /[a-zA-Z]/.test(formInfo.password) && /\d/.test(formInfo.password)
+            ? valid
+            : invalid }
+        >
+          Possuir letras e números
+        </p>
+        <p
+          className={ /\W/.test(formInfo.password)
+            ? valid
+            : invalid }
+        >
+          Possuir algum caractere especial
+        </p>
+      </div>
       <label>
         URL
         <input
@@ -109,15 +147,34 @@ function Form() {
           onChange={ handleChange }
         />
       </label>
-      <button disabled={ naoPreenchido }>Cadastrar</button>
+      <button
+        disabled={ naoPreenchido }
+      >
+        Cadastrar
+      </button>
       <button onClick={ handleCancel }>Cancelar</button>
     </form>
   );
 
   return (
-    <div>
+    <>
       {showForm ? form : newBtn}
-    </div>
+
+      {registeredPasswords.length > 0
+        ? (
+          <ul>
+            { registeredPasswords.map((register, index) => (
+              <li key={ index }>
+                <RegisteredCard
+                  url={ register.url }
+                  login={ register.login }
+                  serviceName={ register.serviceName }
+                  password={ register.password }
+                />
+              </li>))}
+          </ul>)
+        : <p>nenhuma senha cadastrada</p>}
+    </>
   );
 }
 

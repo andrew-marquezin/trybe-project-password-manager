@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import RegisteredCard from './Register';
 
-interface Info {
-  url: string;
-  login: string;
-  serviceName: string;
-  password: string;
+interface InfoWithID {
+  url: string,
+  login: string,
+  serviceName: string,
+  password: string,
+  id: string,
 }
 
 function Form() {
   const [naoPreenchido, setNaoPreenchido] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [registeredPasswords, setRegisteredPasswords] = useState<Info[]>([]);
+  const [registeredPasswords, setRegisteredPasswords] = useState<InfoWithID[]>([]);
   const [formInfo, setFormInfo] = useState({
     serviceName: '',
     login: '',
@@ -57,15 +58,27 @@ function Form() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (validatePassword()) {
-      registeredPasswords.push(formInfo);
-      setRegisteredPasswords(
-        [...registeredPasswords],
-      );
+      const formInfoWithID = {
+        ...formInfo,
+        id: Date.now().toString(36) + Math.random().toString(36),
+      };
+      registeredPasswords.push(formInfoWithID);
       clearForm();
       setShowForm(false);
       return registeredPasswords;
     }
   }
+
+  const handleRemoveCard = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    id: string,
+  ) => {
+    e.preventDefault();
+    setRegisteredPasswords(
+      registeredPasswords.filter((element) => element.id !== id),
+    );
+    console.log(registeredPasswords);
+  };
 
   const newBtn = (
     <div>
@@ -160,20 +173,18 @@ function Form() {
     <>
       {showForm ? form : newBtn}
 
-      {registeredPasswords.length > 0
-        ? (
-          <ul>
-            { registeredPasswords.map((register, index) => (
-              <li key={ index }>
-                <RegisteredCard
-                  url={ register.url }
-                  login={ register.login }
-                  serviceName={ register.serviceName }
-                  password={ register.password }
-                />
-              </li>))}
-          </ul>)
-        : <p>nenhuma senha cadastrada</p>}
+      {!registeredPasswords.length
+        ? <p>nenhuma senha cadastrada</p>
+        : (registeredPasswords.map((register, index) => (
+          <RegisteredCard
+            key={ index }
+            url={ register.url }
+            login={ register.login }
+            id={ register.id }
+            serviceName={ register.serviceName }
+            password={ register.password }
+            removeCard={ handleRemoveCard }
+          />)))}
     </>
   );
 }
